@@ -1,3 +1,6 @@
+from GameManager import GM
+
+
 class PileCards:
     def __init__(self, cm):
         self.cm = cm
@@ -18,7 +21,7 @@ class PileCards:
 
     def ___assingCardPos(self):
         for card in self.card_pile_obj:
-            card.setCardRect((140, 10))
+            card.setCardRect((140, 25))
             card.setPileCard(True)
     
     def getDumpCard(self):
@@ -35,6 +38,8 @@ class PileCards:
             if self.resetted == 3:
                 print("Game Over")
 
+        GM.addMove()
+        
         self.next_p += 1
         self.removed = False
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)] 

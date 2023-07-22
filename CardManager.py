@@ -49,15 +49,15 @@ class CM:
     def loadDeckCard(self):
         texture = gpm.loadTexture(path = "textures/png/back.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
         texture_rect = texture.get_rect()
-        texture_rect.x = 10
-        texture_rect.y = 10
+        texture_rect.x = 25
+        texture_rect.y = 25
         return CardInfo(cardImage=texture, cardRect=texture_rect)
     
     def loadDumpCard(self):
         texture = gpm.loadTexture(path = "textures/png/back.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
         texture_rect = texture.get_rect()
-        texture_rect.x = CM.CARD_WIDTH * 8 + CM.CARD_WIDTH//2
-        texture_rect.y = 10
+        texture_rect.x = CM.CARD_WIDTH * 9
+        texture_rect.y = 25
         return CardInfo(cardImage=texture, cardRect=texture_rect)
 
     def loadCardByID(self, type, value, level):

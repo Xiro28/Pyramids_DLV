@@ -1,6 +1,7 @@
 import sys
 
 from CardManager import CM
+from GameManager import GM
 from DumpPile import DPManager
 from Helper import Helper
 from PileCards import PileCards
@@ -51,6 +52,7 @@ def clearScreen():
         cardsToDraw.append([pc.getCurrentPileCard()])
 
     gpm.drawCards(cardsToDraw)
+    gpm.drawFooter()
     
 
 
@@ -65,6 +67,7 @@ def addNumberToSum(card):
     gpm.highlightCard(card)
 
     if card.isKing():
+        GM.addPoints(100)
         removeCards(card)
         clearFlag = True
         return
@@ -77,6 +80,7 @@ def addNumberToSum(card):
     cardToCheck.append(card)
     if len(cardToCheck) == 2:
         if cardToCheck[0].checkSum(cardToCheck[1]):
+            GM.addPoints(200)
             removeCards(cardToCheck[0], cardToCheck[1])
         clearFlag = True
         cardToCheck = []
@@ -123,7 +127,8 @@ if __name__ == '__main__':
         elif currPileCard != None and gpm.getCollision(currPileCard):
             addNumberToSum(currPileCard)
         elif gpm.getCollision(pc.getBackCard()):
-            gpm.drawCards([[pc.getNextPileCard()]])
+            pc.getNextPileCard()
+            clearFlag = True
         else:
             for card in cm.getCardsPLevels():
                 if gpm.getCollision(card):
