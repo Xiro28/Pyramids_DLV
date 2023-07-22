@@ -15,7 +15,9 @@ class CM:
     GAME_STARTLEVEL = 6
 
     def __init__(self):
+        self.reset()
 
+    def reset(self):
         self.cards_p_levels = list()
         self.cards_enabled = list()
         self.cards_pile = list()
@@ -32,13 +34,16 @@ class CM:
     def getPileCard(self):
         return self.cards_pile
     
+    def getWinState(self):
+        return len(self.cards_enabled) == 0
+
+    
     def getCardsPLevels(self, all = False):
         
         if all:
             return self.cards_p_levels
         else:
             self.UpdateEnabled()
-
             return self.cards_enabled
     
     def loadDeckCard(self):
@@ -102,7 +107,7 @@ class CM:
 
         self.cards_p_levels.append([])
 
-        #shuffle again to have a a more random deck
+        #shuffle again to have a more random deck
         random.shuffle(self.cards[:28])
 
         for card_type, num in self.cards[:28]:

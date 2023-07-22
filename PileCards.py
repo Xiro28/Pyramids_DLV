@@ -1,7 +1,10 @@
 class PileCards:
     def __init__(self, cm):
         self.cm = cm
-        self.card_pile_obj = cm.getPileCard()
+        self.reset()
+    
+    def reset(self):
+        self.card_pile_obj = self.cm.getPileCard()
         self.next_p = -1
 
         self.resetted = 0

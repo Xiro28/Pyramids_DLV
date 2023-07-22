@@ -2,9 +2,12 @@
 class DPManager:
  
     def __init__(self, cm, pc):
-        self.dumpPile = list()
         self.cm = cm
         self.pc = pc
+        self.reset()
+        
+    def reset(self):
+        self.dumpPile = list()
 
     def getDumpPile(self):
         return self.dumpPile

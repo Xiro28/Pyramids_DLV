@@ -2,6 +2,7 @@ import sys
 
 from CardManager import CM
 from DumpPile import DPManager
+from Helper import Helper
 from PileCards import PileCards
 from RenderingManager import GPManager as gpm
 
@@ -79,7 +80,19 @@ def addNumberToSum(card):
             removeCards(cardToCheck[0], cardToCheck[1])
         clearFlag = True
         cardToCheck = []
-    
+
+def reset():
+    global cm
+    global pc
+    global dp
+    global cardToCheck
+
+    cardToCheck = []
+
+    cm.reset()
+    pc.reset()
+    dp.reset()
+
 
 if __name__ == '__main__':
     
@@ -116,6 +129,11 @@ if __name__ == '__main__':
                 if gpm.getCollision(card):
                     addNumberToSum(card)
                     break
+
+        gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
+
+        if cm.getWinState():
+            reset()
 
 
         

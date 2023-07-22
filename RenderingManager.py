@@ -11,7 +11,7 @@ class GPManager():
     def initGraphics():
        pg.init()
        pg.display.set_caption('Pyramids Solitaire')
-       GPManager.screen = pg.display.set_mode((1280, 860), pg.SRCALPHA)
+       GPManager.screen = pg.display.set_mode((1024, 860), pg.SRCALPHA)
        GPManager.screen.fill((0, 128, 40, 255))
 
     @staticmethod
@@ -48,6 +48,30 @@ class GPManager():
             return
         
         pg.draw.rect(GPManager.screen, (80, 80, 180, 255), card.getCardRect(), 3)
+        pg.display.flip()
+
+    @staticmethod
+    def highlightSuggestedCards(cards):
+        if cards == None:
+            return
+        
+        #red, green violet, blue, yellow, orange, white, black, brown, pink, gray, purple, cyan
+        colors = [(255,0,0,255), (0,255,0,255), (238,130,238,255),  \
+                  (0,0,255,255), (255,255,0,255), (255,165,0,255),  \
+                  (255,255,255,255), (0,0,0,255), (165,42,42,255),  \
+                  (255,192,203,255), (128,128,128,255), (128,0,128,255), (0,255,255,255)]
+        
+        idx_c = 0
+        for card in cards:
+            if card == None:
+                continue
+            c1, c2 = card
+            pg.draw.rect(GPManager.screen, colors[idx_c], c1.getCardRect(), 3)
+            
+            if c2 != None:
+                pg.draw.rect(GPManager.screen, colors[idx_c], c2.getCardRect(), 3)
+            idx_c += 1
+            
         pg.display.flip()
 
     @staticmethod
