@@ -1,0 +1,3 @@
+le texture del gioco sono state prese da qui:
+    https://opengameart.org/content/playing-cards-vector-png
+    https://www.bing.com/images/search?view=detailV2&ccid=A1srD5r3&id=14F15F234F6B8ADF8C7829A5C0174F4B955BDC42&thid=OIP.A1srD5r30VLOGy2ql5a-pwHaKy&mediaurl=https%3A%2F%2Fi.pinimg.com%2Foriginals%2F3d%2Fe3%2F40%2F3de340dc82f10724b4b61e8ef2f1f506.jpg&exph=1311&expw=900&q=back+of+card+poker&simid=608053814986951406&form=IRPRST&ck=96DB3339396CEF965187DC322D79BF4B&selectedindex=7&ajaxhist=0&ajaxserp=0&vt=0&sim=11&cdnurl=https%3A%2F%2Fth.bing.com%2Fth%2Fid%2FR.035b2b0f9af7d152ce1b2daa9796bea7%3Frik%3DQtxblUtPF8ClKQ%26pid%3DImgRaw%26r%3D0
