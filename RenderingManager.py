@@ -55,16 +55,24 @@ class GPManager():
         pg.draw.rect(GPManager.screen, (80, 80, 160, 255), card.getCardRect(), 4, border_radius=7)
         pg.display.flip()
 
+
+    def __renderText(text, pos, color):
+        text = GPManager.font.render(text, True, color)
+        GPManager.screen.blit(text, pos)
+
     @staticmethod
     def drawFooter():
         #color wood
         pg.draw.rect(GPManager.screen, (165,42,42,255), (0, 780, 1024, 120))
 
-        str_footer = "Punteggio: " + str(GM.getPoints()) + "  Mosse: " + str(GM.getMove())
+        str_points =  f"Punteggio: {GM.getPoints()}" 
+        str_moves  =  f"Mosse: {GM.getMove()}"
+        str_time   =  f"{int(GM.getElapsedTime())//60:02d}:{int(GM.getElapsedTime()%60):02d}" 
 
-        text_surface = GPManager.font.render(str_footer, True, (255, 255, 255, 255))
-        text_rect = (10, 790, 1024, 120)
-        GPManager.screen.blit(text_surface, text_rect)
+        GPManager.__renderText(str_points, (20, 805, 1024, 55), (255, 255, 255))
+        GPManager.__renderText(str_moves,  (300, 805, 1024, 55), (255, 255, 255))
+        GPManager.__renderText(str_time,   (900, 805, 1024, 55), (255, 255, 255))
+        
         pg.display.flip()
 
     @staticmethod
@@ -95,7 +103,7 @@ class GPManager():
 
     @staticmethod
     def getEvent():
-        GPManager.event = pg.event.wait()
+        GPManager.event = pg.event.wait(100)
     
     @staticmethod
     def getEventQuit():

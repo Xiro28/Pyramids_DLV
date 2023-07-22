@@ -137,6 +137,8 @@ if __name__ == '__main__':
 
         gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
 
+        GM.scheduleAtFixedOne(gpm.drawFooter)
+
         if cm.getWinState():
             reset()
 
