@@ -3,27 +3,32 @@ import pygame as pg
 from GameManager import GM
 
 class GPManager():
-    CARD_WIDTH = 100
-    CARD_HEIGHT = 150
+    CARD_WIDTH = 110
+    CARD_HEIGHT = 155
 
     screen = None
     font = None
     moving = False
 
+    resetTexture = None
+
     @staticmethod
     def initGraphics():
        pg.init()
        pg.display.set_caption('Pyramids Solitaire')
-       GPManager.screen = pg.display.set_mode((1024, 860), pg.SRCALPHA)
+       GPManager.screen = pg.display.set_mode((1100, 860), pg.SRCALPHA)
        GPManager.font = pg.font.Font(None, 36)
+       GPManager.Titlefont = pg.font.Font(None, 100)
+
+       GPManager.resetTexture = GPManager.loadTexture(path = "textures/png/restart.png", resize = (40, 40))
 
     @staticmethod
     def loadTexture(path, resize = ()):
         
         if resize == ():
-            return pg.image.load(path).convert()
+            return pg.image.load(path).convert_alpha()
         
-        return pg.transform.scale(pg.image.load(path).convert(),(resize[0], resize[1]))
+        return pg.transform.scale(pg.image.load(path).convert_alpha(),(resize[0], resize[1]))
     
     @staticmethod
     def clearScreen():
@@ -55,25 +60,13 @@ class GPManager():
         pg.draw.rect(GPManager.screen, (80, 80, 160, 255), card.getCardRect(), 4, border_radius=7)
         pg.display.flip()
 
+    def __renderTitle(text, pos, color):
+        text = GPManager.Titlefont.render(text, True, color)
+        GPManager.screen.blit(text, pos)
 
     def __renderText(text, pos, color):
         text = GPManager.font.render(text, True, color)
         GPManager.screen.blit(text, pos)
-
-    @staticmethod
-    def drawFooter():
-        #color wood
-        pg.draw.rect(GPManager.screen, (165,42,42,255), (0, 780, 1024, 120))
-
-        str_points =  f"Punteggio: {GM.getPoints()}" 
-        str_moves  =  f"Mosse: {GM.getMove()}"
-        str_time   =  f"{int(GM.getElapsedTime())//60:02d}:{int(GM.getElapsedTime()%60):02d}" 
-
-        GPManager.__renderText(str_points, (20, 805, 1024, 55), (255, 255, 255))
-        GPManager.__renderText(str_moves,  (300, 805, 1024, 55), (255, 255, 255))
-        GPManager.__renderText(str_time,   (900, 805, 1024, 55), (255, 255, 255))
-        
-        pg.display.flip()
 
     @staticmethod
     def highlightSuggestedCards(cards):
@@ -110,6 +103,13 @@ class GPManager():
         return (GPManager.event.type == pg.QUIT or (GPManager.event.type == pg.KEYDOWN and GPManager.event.key in [pg.K_ESCAPE, pg.K_q]))
     
     @staticmethod
+    def getCollisionRect(rect):
+        if rect == None:
+            return False
+        return rect.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1
+
+    
+    @staticmethod
     def getCollision(card):
         if card == None:
             return False
@@ -136,3 +136,85 @@ class GPManager():
         
         mx,my=pg.mouse.get_pos()
         card.setCardRect((mx - GPManager.CARD_WIDTH//2, my - GPManager.CARD_HEIGHT//2))
+
+    @staticmethod
+    def drawMenu():
+        while 1:
+            GPManager.getEvent()
+            GPManager.clearScreen()
+
+            GPManager.__renderTitle("Pyramids Solitaire", (250, 100, 1024, 860), (255, 255, 255))
+
+            single_game = pg.Rect(450, 300, 400, 50)
+            endless     = pg.Rect(450, 350, 400, 50)
+            aimode      = pg.Rect(450, 400, 400, 50)
+            option      = pg.Rect(450, 450, 400, 50)
+            _exit       = pg.Rect(450, 500, 400, 50)
+
+            pg.draw.rect(GPManager.screen, (10,120,50,255), (400, 260, 300, 300), border_radius=10)
+            GPManager.__renderText("1. Single Game", single_game, (255, 255, 255))
+            GPManager.__renderText("2. Endless",     endless,     (255, 255, 255))
+            GPManager.__renderText("3. AI (Endless)", aimode,       (255, 255, 255))
+            GPManager.__renderText("4. Option",      option,      (255, 255, 255))
+            GPManager.__renderText("5. Exit",        _exit,       (255, 255, 255))
+
+            if GPManager.getEventQuit():
+                exit()
+
+            if single_game.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                return 0
+            elif endless.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                return 1
+            elif aimode.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                return 2
+            elif option.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                pass
+            elif _exit.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                exit()
+
+            GPManager.Update()
+
+    @staticmethod
+    def drawFooter():
+        #color wood
+        pg.draw.rect(GPManager.screen, (150,42,60,255), (0, 780, 1100, 120))
+
+        str_points =  f"Punteggio: {GM.getPoints()}" 
+        str_moves  =  f"Mosse: {GM.getMove()}"
+        str_time   =  f"{int(GM.getElapsedTime())//60:02d}:{int(GM.getElapsedTime()%60):02d}" 
+
+
+        GPManager.__renderText(str_points, (20, 805, 50, 55),  (255, 255, 255))
+        GPManager.__renderText(str_moves,  (300, 805, 50, 55), (255, 255, 255))
+        GPManager.__renderText(str_time,   (900, 805, 50, 55), (255, 255, 255))
+
+        rect = GPManager.resetTexture.get_rect()
+
+        
+        GPManager.screen.blit(GPManager.resetTexture, rect)
+        pg.display.flip()
+
+
+    def drawScreen(str):
+        while 1:
+            GPManager.getEvent()
+
+            GPManager.__renderTitle(f"You {str}", (400, 200, 1024, 860), (255, 255, 255))
+
+            restart     = pg.Rect(400, 400, 1024, 50)
+            goMenu      = pg.Rect(400, 450, 1024, 50)
+
+
+            GPManager.__renderText("Restart", restart, (255, 255, 255))
+            GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
+
+            if GPManager.getEventQuit():
+                exit()
+
+            if restart.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                return 0
+            elif goMenu.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                return 1
+
+
+            GPManager.Update()

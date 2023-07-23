@@ -4,8 +4,8 @@ class Helper:
 
     @staticmethod
     def findSumBetweenCards(cards, pile_card = None):
-        #privilege kings
-        sorted_cards = sorted(cards, key=lambda card: card.getCardValue(), reverse=True)
+        #privilege kings and high level cards
+        sorted_cards = sorted(cards, key=lambda card: card.getCardValue() + card.getLevel(), reverse=True)
 
         res = list()
 
@@ -26,7 +26,7 @@ class Helper:
                 res.append((pile_card, sorted_cards[i]))
                 continue
 
-            for j in range(i+1, len(sorted_cards)):
+            for j in range(len(sorted_cards)-1, -1, -1):
                 if sorted_cards[i].checkSum(sorted_cards[j]):
                     res.append((sorted_cards[i], sorted_cards[j]))
 

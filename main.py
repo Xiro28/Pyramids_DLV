@@ -109,6 +109,29 @@ if __name__ == '__main__':
 
     clearFlag = True
 
+    def modeEndless():
+        reset()
+
+    def modeTimed():
+        #show win screen and go back to main menu
+        pass
+
+    def modeSingle():
+        #show win screen and go back to main menu
+        clearScreen()
+        retVal = gpm.drawScreen("Win")
+        reset()
+        GM.reset()
+        if retVal == 1:
+            gpm.drawMenu()
+
+
+    gameModes = [modeSingle, modeEndless, modeTimed]
+
+    gMode = gpm.drawMenu()
+
+    GM.reset()
+
     while 1:
         gpm.getEvent()
 
@@ -121,6 +144,10 @@ if __name__ == '__main__':
 
         currPileCard = pc.getCurrentPileCard()
 
+        if gpm.getCollisionRect(gpm.resetTexture.get_rect()):
+            reset()
+            GM.reset()
+            clearFlag = True
         if gpm.getCollision(pc.getDumpCard()):
             dp.restoreLastMove()
             clearFlag = True
@@ -140,7 +167,9 @@ if __name__ == '__main__':
         GM.scheduleAtFixedOne(gpm.drawFooter)
 
         if cm.getWinState():
-            reset()
+            gameModes[gMode]()
+
+        
 
 
         

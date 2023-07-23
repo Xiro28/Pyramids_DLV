@@ -5,8 +5,8 @@ from RenderingManager import GPManager as gpm
 from CardInfo import CardInfo
 
 class CM:
-    CARD_WIDTH = 100
-    CARD_HEIGHT = 150
+    CARD_WIDTH = 110
+    CARD_HEIGHT = 155
 
     CARDS_TYPE = ["spades", "hearts", "diamonds", "clubs"]
     CARDS_VALUE = ["ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king"]
@@ -47,17 +47,17 @@ class CM:
             return self.cards_enabled
     
     def loadDeckCard(self):
-        texture = gpm.loadTexture(path = "textures/png/back.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
+        texture = gpm.loadTexture(path = "textures/png/R.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
         texture_rect = texture.get_rect()
-        texture_rect.x = 25
-        texture_rect.y = 25
+        texture_rect.x = 40
+        texture_rect.y = 40
         return CardInfo(cardImage=texture, cardRect=texture_rect)
     
     def loadDumpCard(self):
-        texture = gpm.loadTexture(path = "textures/png/back.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
+        texture = gpm.loadTexture(path = "textures/png/R.jpg", resize = (CM.CARD_WIDTH, CM.CARD_HEIGHT))
         texture_rect = texture.get_rect()
-        texture_rect.x = CM.CARD_WIDTH * 9
-        texture_rect.y = 25
+        texture_rect.x = CM.CARD_WIDTH * 8 + CM.CARD_WIDTH // 2
+        texture_rect.y = 40
         return CardInfo(cardImage=texture, cardRect=texture_rect)
 
     def loadCardByID(self, type, value, level):

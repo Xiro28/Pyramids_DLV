@@ -45,6 +45,10 @@ class GM:
     @staticmethod
     def addMove():
         GM.move += 1
-    
+
+    def reset():
+        GM.points = 0
+        GM.move = 0
+        GM.start_time = time.time()
 
         
