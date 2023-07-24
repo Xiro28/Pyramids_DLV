@@ -12,7 +12,6 @@ cm = None
 pc = None
 dp = None
 
-
 def removeCards(card1, card2 = None):
 
     global pc
@@ -56,7 +55,10 @@ def clearScreen():
     gpm.drawCards(cardsToDraw)
     gpm.drawFooter()
     
-
+#TODO make menu button inside the footer
+#TODO AI mode
+#TODO Timed mode ?
+#TODO Animations ?
 
 #pensa una soluzione stile iteratore
 #quando arrivi a 2 carte controlli la loro somma e le rimuovi in caso sia positivo == 13
@@ -132,56 +134,62 @@ if __name__ == '__main__':
 
     gameModes = [modeSingle, modeEndless, modeTimed]
 
-    selected = gpm.drawMenu()
-
-    #option selected
-    while selected == 3:
-        gpm.drawOptions()
-        selected = gpm.drawMenu()
-
-    GM.reset()
-
-    #AI selected
-    if selected == 2:
-        pass
 
     while 1:
-        gpm.getEvent()
+        selected = gpm.drawMenu()
 
-        if gpm.getEventQuit():
-            sys.exit()
+        #option selected
+        while selected == 3:
+            gpm.drawOptions()
+            selected = gpm.drawMenu()
 
-        if clearFlag:
-            clearScreen()
-            clearFlag = False
+        GM.reset()
 
-        currPileCard = pc.getCurrentPileCard()
+        #AI selected
+        if selected == 2:
+            pass
 
-        if gpm.getCollisionRect(gpm.resetTexture_rect):
-            reset()
-            GM.reset()
-            clearFlag = True
-        if gpm.getCollision(pc.getDumpCard()):
-            dp.restoreLastMove()
-            clearFlag = True
-        elif pc.canDrawPileCard() and gpm.getCollision(currPileCard):
-            addNumberToSum(currPileCard)
-        elif gpm.getCollision(pc.getBackCard()):
-            pc.getNextPileCard()
-            clearFlag = True
-        else:
-            for card in cm.getCardsPLevels():
-                if gpm.getCollision(card):
-                    addNumberToSum(card)
-                    break
+        while 1:
+            gpm.getEvent()
 
-        if Options.getOption("hint"):
-            gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
+            if gpm.getEventQuit():
+                sys.exit()
 
-        GM.scheduleAtFixedOne(gpm.drawFooter)
+            if clearFlag:
+                clearScreen()
+                clearFlag = False
 
-        if cm.getWinState():
-            gameModes[selected]()
+            currPileCard = pc.getCurrentPileCard()
+            if gpm.getCollisionRect(gpm.menuTexture_rect):
+                reset()
+                GM.reset()
+                clearFlag = True
+                break
+            elif gpm.getCollisionRect(gpm.resetTexture_rect):
+                reset()
+                GM.reset()
+                clearFlag = True
+            elif gpm.getCollision(pc.getDumpCard()):
+                dp.restoreLastMove()
+                clearFlag = True
+            elif pc.canDrawPileCard() and gpm.getCollision(currPileCard):
+                addNumberToSum(currPileCard)
+            elif gpm.getCollision(pc.getBackCard()):
+                pc.getNextPileCard()
+                clearFlag = True
+            else:
+                for card in cm.getCardsPLevels():
+                    if gpm.getCollision(card):
+                        addNumberToSum(card)
+                        break
+
+            if Options.getOption("hint"):
+                gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
+
+            GM.scheduleAtFixedOne(gpm.drawFooter)
+
+            if cm.getWinState():
+                gameModes[selected]()
 
         
 

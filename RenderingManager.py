@@ -14,6 +14,9 @@ class GPManager():
     resetTexture = None
     resetTexture_rect = None
 
+    menuTexture = None
+    menuTexture_rect = None
+
     @staticmethod
     def initGraphics():
        pg.init()
@@ -24,8 +27,13 @@ class GPManager():
 
        GPManager.resetTexture = GPManager.loadTexture(path = "textures/png/restart.png", resize = (40, 40))
        GPManager.resetTexture_rect = GPManager.resetTexture.get_rect()
-       GPManager.resetTexture_rect.x = 1020
+       GPManager.resetTexture_rect.x = 950
        GPManager.resetTexture_rect.y = 800
+
+       GPManager.menuTexture = GPManager.loadTexture(path = "textures/png/menu.png", resize = (50, 50))
+       GPManager.menuTexture_rect = GPManager.menuTexture.get_rect()
+       GPManager.menuTexture_rect.x = 1020
+       GPManager.menuTexture_rect.y = 795
 
     @staticmethod
     def loadTexture(path, resize = ()):
@@ -160,7 +168,7 @@ class GPManager():
 
     def __getRotatedTexture(texture, angle, coords):
         rotated_rect = texture.get_rect().move(coords[0], coords[1])
-        rotated_size = (200, 200)
+        rotated_size = (300, 300)
         rotated_surface = pg.Surface(rotated_size, pg.SRCALPHA)
 
         rotated_surface.fill((0, 0, 0, 0))  # Fill with transparent color
@@ -188,11 +196,11 @@ class GPManager():
             #back_card2_rect = back_card2_rect_rot.get_rect()
 
             # Create a surface with the desired size and draw something on it
-            card1 = GPManager.loadTexture(path = "textures/png/ace_of_clubs.png", resize = (110, 155))
-            card2 = GPManager.loadTexture(path = "textures/png/jack_of_hearts.png", resize = (110, 155))
+            card1 = GPManager.loadTexture(path = "textures/png/ace_of_clubs.png", resize = (150, 195))
+            card2 = GPManager.loadTexture(path = "textures/png/jack_of_hearts.png", resize = (150, 195))
 
-            rotatedCard1, rotatedCard1_rect = GPManager.__getRotatedTexture(card1, 340, (900, 140))
-            rotatedCard2, rotatedCard2_rect = GPManager.__getRotatedTexture(card2, 355, (850, 150))
+            rotatedCard1, rotatedCard1_rect = GPManager.__getRotatedTexture(card1, 340, (870, 140))
+            rotatedCard2, rotatedCard2_rect = GPManager.__getRotatedTexture(card2, 355, (830, 150))
 
             GPManager.screen.blit(rotatedCard1, rotatedCard1_rect.topleft)
             GPManager.screen.blit(rotatedCard2, rotatedCard2_rect.topleft)
@@ -237,8 +245,9 @@ class GPManager():
         GPManager.__renderText(str_points, (20, 805, 50, 55),  (255, 255, 255))
         GPManager.__renderText(str_moves,  (300, 805, 50, 55), (255, 255, 255))
         GPManager.__renderText(str_games,  (500, 805, 50, 55), (255, 255, 255))
-        GPManager.__renderText(str_time,   (850, 805, 50, 55), (255, 255, 255))
+        GPManager.__renderText(str_time,   (750, 805, 50, 55), (255, 255, 255))
 
+        GPManager.screen.blit(GPManager.menuTexture, GPManager.menuTexture_rect)
         GPManager.screen.blit(GPManager.resetTexture, GPManager.resetTexture_rect)
         
         GPManager.Update()
@@ -248,7 +257,7 @@ class GPManager():
 
         white = (255, 255, 255)
 
-        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), plus_button_rect)
+        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), plus_button_rect, border_radius=8)
 
         # disegnamo prima |
         pg.draw.line(GPManager.screen, white, (plus_button_rect.centerx, plus_button_rect.top + 5), (plus_button_rect.centerx, plus_button_rect.bottom - 5), 3)
@@ -256,7 +265,7 @@ class GPManager():
         # disegnamo poi ----
         pg.draw.line(GPManager.screen, white, (plus_button_rect.left + 5, plus_button_rect.centery), (plus_button_rect.right - 5, plus_button_rect.centery), 3)
 
-        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), minus_button_rect)
+        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), minus_button_rect, border_radius=8)
 
         #per il meno disegnamo solo -----
         pg.draw.line(GPManager.screen, white, (minus_button_rect.left + 5, minus_button_rect.centery), (minus_button_rect.right - 5, minus_button_rect.centery), 3)
