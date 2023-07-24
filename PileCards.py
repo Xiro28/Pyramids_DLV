@@ -35,7 +35,7 @@ class PileCards:
         if self.pileFinished:
             return None
         
-        return  self.backCard 
+        return self.backCard 
 
     def getNextPileCard(self):
 
@@ -73,8 +73,10 @@ class PileCards:
         if self.removed:
             self.next_p -= 1
             self.removed = False
-            if self.next_p < 0:
-                self.next_p = 0
+            
+            if self.next_p < -1:
+                self.next_p = -1
+
             self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
         
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
