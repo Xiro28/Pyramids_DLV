@@ -3,14 +3,24 @@ import time
 class GM:
     points = 0
     move = 0
+    game = 1
     start_time = time.time()
 
     @staticmethod
-    def reset():
+    def reset(reset_game = True):
         GM.points = 0
         GM.move = 0
+        if reset_game:
+            GM.game = 1
         GM.start_time = time.time()
 
+
+    @staticmethod
+    def getGame():
+        return GM.game
+    
+    def addGame():
+        GM.game += 1
     
     @staticmethod
     def getElapsedTime():
@@ -45,10 +55,5 @@ class GM:
     @staticmethod
     def addMove():
         GM.move += 1
-
-    def reset():
-        GM.points = 0
-        GM.move = 0
-        GM.start_time = time.time()
 
         

@@ -1,3 +1,4 @@
+import random
 from GameManager import GM
 
 
@@ -35,8 +36,14 @@ class PileCards:
         if (self.next_p % len(self.card_pile_obj)) == 0:
             self.resetted += 1
 
-            if self.resetted == 3:
-                print("Game Over")
+            #shuffle cards, alcune regole dicono che si puo' mescolare solo 2 volte
+            random.shuffle(self.card_pile_obj)
+
+            #TODO: Aumenare difficoltà con max un rimescolamento, oppure senza
+
+        if self.resetted >= 1:
+            return self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
+
 
         GM.addMove()
 
@@ -45,8 +52,16 @@ class PileCards:
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)] 
 
     def getCurrentPileCard(self):
-        if self.removed:
+
+        if self.next_p == -1:
             return None
+
+        if self.removed:
+            self.next_p -= 1
+            self.removed = False
+            if self.next_p < 0:
+                self.next_p = 0
+            self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
         
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
     

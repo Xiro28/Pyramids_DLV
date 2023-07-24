@@ -11,6 +11,7 @@ class GPManager():
     moving = False
 
     resetTexture = None
+    resetTexture_rect = None
 
     @staticmethod
     def initGraphics():
@@ -21,6 +22,9 @@ class GPManager():
        GPManager.Titlefont = pg.font.Font(None, 100)
 
        GPManager.resetTexture = GPManager.loadTexture(path = "textures/png/restart.png", resize = (40, 40))
+       GPManager.resetTexture_rect = GPManager.resetTexture.get_rect()
+       GPManager.resetTexture_rect.x = 1020
+       GPManager.resetTexture_rect.y = 800
 
     @staticmethod
     def loadTexture(path, resize = ()):
@@ -38,6 +42,22 @@ class GPManager():
     def Update():
         pg.display.flip()
 
+
+    @staticmethod
+    def drawCard(card, rect = None, direct = False):
+        if card == None:
+            return
+        
+        if rect == None:
+            pg.draw.rect(GPManager.screen, (255, 255, 255, 0), card.getCardRect(), border_radius=7)
+            GPManager.screen.blit(card.getCardImage(), card.getCardRect(), special_flags=pg.BLEND_RGBA_MIN)
+        else:
+            pg.draw.rect(GPManager.screen, (255, 255, 255, 0), rect, border_radius=7)
+            GPManager.screen.blit(card, rect, special_flags=pg.BLEND_RGBA_MIN)
+
+        if direct:
+            pg.display.flip()
+
     @staticmethod
     def drawCards(cards):
         if cards == None:
@@ -47,8 +67,7 @@ class GPManager():
             for card in cards_level:
                 if card == None:
                     continue
-                pg.draw.rect(GPManager.screen, (255, 255, 255, 0), card.getCardRect(), border_radius=7)
-                GPManager.screen.blit(card.getCardImage(), card.getCardRect(), special_flags=pg.BLEND_RGBA_MIN)
+                GPManager.drawCard(card)
 
         pg.display.flip()
 
@@ -137,24 +156,50 @@ class GPManager():
         mx,my=pg.mouse.get_pos()
         card.setCardRect((mx - GPManager.CARD_WIDTH//2, my - GPManager.CARD_HEIGHT//2))
 
+
+    def __getRotatedTexture(texture, angle, coords):
+        rotated_rect = texture.get_rect().move(coords[0], coords[1])
+        rotated_size = (200, 200)
+        rotated_surface = pg.Surface(rotated_size, pg.SRCALPHA)
+
+        rotated_surface.fill((0, 0, 0, 0))  # Fill with transparent color
+        rotated_surface.blit(pg.transform.rotate(texture, angle), (0, 0))
+
+        return rotated_surface, rotated_rect
     @staticmethod
     def drawMenu():
         while 1:
             GPManager.getEvent()
             GPManager.clearScreen()
 
-            GPManager.__renderTitle("Pyramids Solitaire", (250, 100, 1024, 860), (255, 255, 255))
+            GPManager.__renderTitle("Pyramids Solitaire", (200, 200, 1024, 860), (255, 255, 255))
 
-            single_game = pg.Rect(450, 300, 400, 50)
-            endless     = pg.Rect(450, 350, 400, 50)
-            aimode      = pg.Rect(450, 400, 400, 50)
-            option      = pg.Rect(450, 450, 400, 50)
-            _exit       = pg.Rect(450, 500, 400, 50)
+            single_game = pg.Rect(450, 400, 400, 50)
+            endless     = pg.Rect(450, 450, 400, 50)
+            aimode      = pg.Rect(450, 500, 400, 50)
+            option      = pg.Rect(450, 550, 400, 50)
+            _exit       = pg.Rect(450, 600, 400, 50)
 
-            pg.draw.rect(GPManager.screen, (10,120,50,255), (400, 260, 300, 300), border_radius=10)
+            ##draw 2 back cards at the left of the title
+            #back_card2_rect_rot = pg.transform.rotate(pg.Surface((110, 155), pg.SRCALPHA), 30)
+            #back_card2_rect = back_card2_rect_rot.get_rect()
+
+            # Create a surface with the desired size and draw something on it
+            card1 = GPManager.loadTexture(path = "textures/png/ace_of_clubs.png", resize = (110, 155))
+            card2 = GPManager.loadTexture(path = "textures/png/jack_of_hearts.png", resize = (110, 155))
+
+            rotatedCard1, rotatedCard1_rect = GPManager.__getRotatedTexture(card1, 340, (900, 140))
+            rotatedCard2, rotatedCard2_rect = GPManager.__getRotatedTexture(card2, 355, (850, 150))
+
+            GPManager.screen.blit(rotatedCard1, rotatedCard1_rect.topleft)
+            GPManager.screen.blit(rotatedCard2, rotatedCard2_rect.topleft)
+
+           
+            pg.draw.rect(GPManager.screen, (10,110,50,255), (400, 360, 300, 300), border_radius=10)
+            pg.draw.rect(GPManager.screen, (0,60,00,255),  (400, 360, 300, 300), 2, border_radius=10)
             GPManager.__renderText("1. Single Game", single_game, (255, 255, 255))
             GPManager.__renderText("2. Endless",     endless,     (255, 255, 255))
-            GPManager.__renderText("3. AI (Endless)", aimode,       (255, 255, 255))
+            GPManager.__renderText("3. AI (Endless)", aimode,     (255, 255, 255))
             GPManager.__renderText("4. Option",      option,      (255, 255, 255))
             GPManager.__renderText("5. Exit",        _exit,       (255, 255, 255))
 
@@ -181,17 +226,17 @@ class GPManager():
 
         str_points =  f"Punteggio: {GM.getPoints()}" 
         str_moves  =  f"Mosse: {GM.getMove()}"
+        str_games  =  f"Gioco: {GM.getGame()}"
         str_time   =  f"{int(GM.getElapsedTime())//60:02d}:{int(GM.getElapsedTime()%60):02d}" 
 
 
         GPManager.__renderText(str_points, (20, 805, 50, 55),  (255, 255, 255))
         GPManager.__renderText(str_moves,  (300, 805, 50, 55), (255, 255, 255))
-        GPManager.__renderText(str_time,   (900, 805, 50, 55), (255, 255, 255))
+        GPManager.__renderText(str_games,  (500, 805, 50, 55), (255, 255, 255))
+        GPManager.__renderText(str_time,   (850, 805, 50, 55), (255, 255, 255))
 
-        rect = GPManager.resetTexture.get_rect()
-
+        GPManager.screen.blit(GPManager.resetTexture, GPManager.resetTexture_rect)
         
-        GPManager.screen.blit(GPManager.resetTexture, rect)
         pg.display.flip()
 
 
@@ -199,11 +244,13 @@ class GPManager():
         while 1:
             GPManager.getEvent()
 
-            GPManager.__renderTitle(f"You {str}", (400, 200, 1024, 860), (255, 255, 255))
+            pg.draw.rect(GPManager.screen, (10,110,50,255), (330, 250, 520, 300), border_radius=10)
+            pg.draw.rect(GPManager.screen, (0,60,00,255),  (330, 250, 520, 300), 2, border_radius=10)
+
+            GPManager.__renderTitle(f"{str}", (350, 300, 1024, 860), (255, 255, 255))
 
             restart     = pg.Rect(400, 400, 1024, 50)
             goMenu      = pg.Rect(400, 450, 1024, 50)
-
 
             GPManager.__renderText("Restart", restart, (255, 255, 255))
             GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
