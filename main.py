@@ -4,6 +4,7 @@ from CardManager import CM
 from GameManager import GM
 from DumpPile import DPManager
 from Helper import Helper
+from Option import Options
 from PileCards import PileCards
 from RenderingManager import GPManager as gpm
 
@@ -49,7 +50,7 @@ def clearScreen():
 
     if pc.canDrawPileCard():
         cardsToDraw.append([pc.getCurrentPileCard()])
-        
+
     gpm.clearScreen()
 
     gpm.drawCards(cardsToDraw)
@@ -131,9 +132,18 @@ if __name__ == '__main__':
 
     gameModes = [modeSingle, modeEndless, modeTimed]
 
-    gMode = gpm.drawMenu()
+    selected = gpm.drawMenu()
+
+    #option selected
+    while selected == 3:
+        gpm.drawOptions()
+        selected = gpm.drawMenu()
 
     GM.reset()
+
+    #AI selected
+    if selected == 2:
+        pass
 
     while 1:
         gpm.getEvent()
@@ -154,7 +164,7 @@ if __name__ == '__main__':
         if gpm.getCollision(pc.getDumpCard()):
             dp.restoreLastMove()
             clearFlag = True
-        elif currPileCard != None and gpm.getCollision(currPileCard):
+        elif pc.canDrawPileCard() and gpm.getCollision(currPileCard):
             addNumberToSum(currPileCard)
         elif gpm.getCollision(pc.getBackCard()):
             pc.getNextPileCard()
@@ -165,12 +175,13 @@ if __name__ == '__main__':
                     addNumberToSum(card)
                     break
 
-        gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
+        if Options.getOption("hint"):
+            gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
 
         GM.scheduleAtFixedOne(gpm.drawFooter)
 
         if cm.getWinState():
-            gameModes[gMode]()
+            gameModes[selected]()
 
         
 

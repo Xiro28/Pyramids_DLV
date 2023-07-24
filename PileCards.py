@@ -63,7 +63,7 @@ class PileCards:
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)] 
     
     def canDrawPileCard(self):
-        return self.next_p != -1
+        return self.next_p > -1
 
     def getCurrentPileCard(self):
 
@@ -73,7 +73,7 @@ class PileCards:
         if self.removed:
             self.next_p -= 1
             self.removed = False
-            
+
             if self.next_p < -1:
                 self.next_p = -1
 

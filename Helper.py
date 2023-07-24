@@ -4,6 +4,7 @@ class Helper:
 
     @staticmethod
     def findSumBetweenCards(cards, pile_card = None):
+
         #privilege kings and high level cards
         sorted_cards = sorted(cards, key=lambda card: card.getCardValue() + card.getLevel(), reverse=True)
 

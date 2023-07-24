@@ -1,6 +1,7 @@
 import pygame as pg
 
 from GameManager import GM
+from Option import Options
 
 class GPManager():
     CARD_WIDTH = 110
@@ -56,7 +57,7 @@ class GPManager():
             GPManager.screen.blit(card, rect, special_flags=pg.BLEND_RGBA_MIN)
 
         if direct:
-            pg.display.flip()
+            GPManager.Update()
 
     @staticmethod
     def drawCards(cards):
@@ -69,7 +70,7 @@ class GPManager():
                     continue
                 GPManager.drawCard(card)
 
-        pg.display.flip()
+        GPManager.Update()
 
     @staticmethod
     def highlightCard(card):
@@ -77,7 +78,7 @@ class GPManager():
             return
         
         pg.draw.rect(GPManager.screen, (80, 80, 160, 255), card.getCardRect(), 4, border_radius=7)
-        pg.display.flip()
+        GPManager.Update()
 
     def __renderTitle(text, pos, color):
         text = GPManager.Titlefont.render(text, True, color)
@@ -111,7 +112,7 @@ class GPManager():
                 pg.draw.rect(GPManager.screen, colors[idx_c], c2.getCardRect(), 3, border_radius=7)
             idx_c += 1
             
-        pg.display.flip()
+        GPManager.Update()
 
     @staticmethod
     def getEvent():
@@ -166,6 +167,8 @@ class GPManager():
         rotated_surface.blit(pg.transform.rotate(texture, angle), (0, 0))
 
         return rotated_surface, rotated_rect
+    
+    
     @staticmethod
     def drawMenu():
         while 1:
@@ -206,16 +209,17 @@ class GPManager():
             if GPManager.getEventQuit():
                 exit()
 
-            if single_game.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                return 0
-            elif endless.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                return 1
-            elif aimode.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                return 2
-            elif option.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                pass
-            elif _exit.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                exit()
+            if GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                if single_game.collidepoint(pg.mouse.get_pos()):
+                    return 0
+                elif endless.collidepoint(pg.mouse.get_pos()):
+                    return 1
+                elif aimode.collidepoint(pg.mouse.get_pos()):
+                    return 2
+                elif option.collidepoint(pg.mouse.get_pos()):
+                    return 3
+                elif _exit.collidepoint(pg.mouse.get_pos()):
+                    exit()
 
             GPManager.Update()
 
@@ -237,7 +241,75 @@ class GPManager():
 
         GPManager.screen.blit(GPManager.resetTexture, GPManager.resetTexture_rect)
         
-        pg.display.flip()
+        GPManager.Update()
+
+
+    def __drawPlusMinusButton(plus_button_rect, minus_button_rect):
+
+        white = (255, 255, 255)
+
+        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), plus_button_rect)
+
+        # disegnamo prima |
+        pg.draw.line(GPManager.screen, white, (plus_button_rect.centerx, plus_button_rect.top + 5), (plus_button_rect.centerx, plus_button_rect.bottom - 5), 3)
+
+        # disegnamo poi ----
+        pg.draw.line(GPManager.screen, white, (plus_button_rect.left + 5, plus_button_rect.centery), (plus_button_rect.right - 5, plus_button_rect.centery), 3)
+
+        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), minus_button_rect)
+
+        #per il meno disegnamo solo -----
+        pg.draw.line(GPManager.screen, white, (minus_button_rect.left + 5, minus_button_rect.centery), (minus_button_rect.right - 5, minus_button_rect.centery), 3)
+
+        return plus_button_rect, minus_button_rect
+    
+    @staticmethod
+    def drawOptions():
+
+        shuffle_value = Options.getOption("shuffle")
+        reload_times_value = Options.getOption("reload")
+        hint_value = Options.getOption("hint")   
+
+        white = (255, 255, 255)
+        red = (255, 0, 0) 
+        
+        while 1:
+            GPManager.getEvent()
+            GPManager.clearScreen()
+
+            if GPManager.getEventQuit():
+                exit()
+
+            reload_times_text = GPManager.font.render("Reload Times: " + str(reload_times_value), True, white)
+            GPManager.screen.blit(reload_times_text, (300, 200))
+
+            shuffle_text = GPManager.font.render("Shuffle: " + ("On" if shuffle_value else "Off"), True, white if shuffle_value else red)
+            GPManager.screen.blit(shuffle_text, (300, 240))
+
+            hint_text = GPManager.font.render("Hint: " + ("On" if hint_value else "Off"), True, white if hint_value else red)
+            GPManager.screen.blit(hint_text, (300, 280))
+
+            confirm_text = GPManager.font.render("Confirm changes", True, white)
+            GPManager.screen.blit(confirm_text, (300, 340))
+
+            plus_button_rect_r, minus_button_rect_r = GPManager.__drawPlusMinusButton(pg.Rect(570, 200, 30, 30), pg.Rect(520, 200, 30, 30))
+
+            if GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                if plus_button_rect_r.collidepoint(GPManager.event.pos):
+                    reload_times_value += 1
+                elif minus_button_rect_r.collidepoint(GPManager.event.pos):
+                    reload_times_value -= 1 if reload_times_value > 1 else 0
+                elif shuffle_text.get_rect(topleft=(300, 240)).collidepoint(GPManager.event.pos):
+                    shuffle_value = (shuffle_value + 1) % 2
+                elif hint_text.get_rect(topleft=(300, 280)).collidepoint(GPManager.event.pos):
+                    hint_value = (hint_value + 1) % 2
+                elif confirm_text.get_rect(topleft=(300, 340)).collidepoint(GPManager.event.pos):
+                    Options.setOption("shuffle", shuffle_value)
+                    Options.setOption("reload", reload_times_value)
+                    Options.setOption("hint", hint_value)
+                    return
+
+            GPManager.Update()
 
 
     def drawScreen(str):
@@ -258,10 +330,11 @@ class GPManager():
             if GPManager.getEventQuit():
                 exit()
 
-            if restart.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                return 0
-            elif goMenu.collidepoint(pg.mouse.get_pos()) and GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
-                return 1
+            if GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
+                if restart.collidepoint(pg.mouse.get_pos()):
+                    return 0
+                elif goMenu.collidepoint(pg.mouse.get_pos()):
+                    return 1
 
 
             GPManager.Update()
