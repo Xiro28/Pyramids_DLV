@@ -1,5 +1,6 @@
 import random
 from GameManager import GM
+from Option import Options
 
 
 class PileCards:
@@ -14,6 +15,7 @@ class PileCards:
         self.resetted = 0
 
         self.removed = True
+        self.pileFinished = False
 
         self.backCard = self.cm.loadDeckCard()
         self.dumpCard = self.cm.loadDumpCard()
@@ -30,26 +32,38 @@ class PileCards:
 
     def getBackCard(self):
         #TODO cambiare texture quando le carte terminano
+        if self.pileFinished:
+            return None
+        
         return  self.backCard 
 
     def getNextPileCard(self):
-        if (self.next_p % len(self.card_pile_obj)) == 0:
+
+        if not self.pileFinished: 
+            self.next_p += 1
+            self.removed = False
+
+            GM.addMove()
+
+        if (self.next_p >= (len(self.card_pile_obj) - 1)):
+            reload_times = Options.getOption("reload")
             self.resetted += 1
+            
+            if self.resetted >= reload_times and reload_times != -1:
+                self.pileFinished = True
+                return self.card_pile_obj[self.next_p]
+            
+            do_shuffle = Options.getOption("shuffle")
+            self.next_p = -1
 
             #shuffle cards, alcune regole dicono che si puo' mescolare solo 2 volte
-            random.shuffle(self.card_pile_obj)
-
-            #TODO: Aumenare difficoltà con max un rimescolamento, oppure senza
-
-        if self.resetted >= 1:
-            return self.card_pile_obj[self.next_p % len(self.card_pile_obj)]
-
-
-        GM.addMove()
-
-        self.next_p += 1
-        self.removed = False
+            if do_shuffle:
+                random.shuffle(self.card_pile_obj)
+            
         return self.card_pile_obj[self.next_p % len(self.card_pile_obj)] 
+    
+    def canDrawPileCard(self):
+        return self.next_p != -1
 
     def getCurrentPileCard(self):
 

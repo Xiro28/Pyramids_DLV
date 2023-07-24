@@ -41,15 +41,16 @@ def clearScreen():
 
     cardsToDraw = cm.getCardsPLevels(True).copy()
 
-    cardsToDraw.append([pc.getBackCard()])
-
-    gpm.clearScreen()
+    if pc.getBackCard() != None:
+        cardsToDraw.append([pc.getBackCard()])
 
     if dp.getNumDumpPile() > 0:
         cardsToDraw.append([pc.getDumpCard()])
 
-    if pc.getCurrentPileCard() != None:
+    if pc.canDrawPileCard():
         cardsToDraw.append([pc.getCurrentPileCard()])
+        
+    gpm.clearScreen()
 
     gpm.drawCards(cardsToDraw)
     gpm.drawFooter()
