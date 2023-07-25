@@ -49,7 +49,7 @@ class PileCards:
             reload_times = Options.getOption("reload")
             self.resetted += 1
             
-            if self.resetted >= reload_times and reload_times != -1:
+            if self.resetted > reload_times and reload_times != -1:
                 self.pileFinished = True
                 return self.card_pile_obj[self.next_p]
             
@@ -64,6 +64,9 @@ class PileCards:
     
     def canDrawPileCard(self):
         return self.next_p > -1
+    
+    def getCards(self):
+        return self.card_pile_obj
 
     def getCurrentPileCard(self):
 

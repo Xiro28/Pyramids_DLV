@@ -36,3 +36,21 @@ class Helper:
                 return res
             
         return res
+    
+    @staticmethod
+    def checkGameOver(cards, pile_cards):
+        
+        for deckCard in cards:
+
+            if deckCard.isKing():
+                return False
+            
+            for pileCard in pile_cards:
+
+                if pileCard.isKing():
+                    return False
+            
+                if deckCard.checkSum(pileCard):
+                    return False
+            
+        return True

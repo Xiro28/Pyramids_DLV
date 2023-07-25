@@ -39,24 +39,32 @@ def clearScreen():
     global pc
     global dp
 
+    gpm.clearScreen()
+
     cardsToDraw = cm.getCardsPLevels(True).copy()
 
     if pc.getBackCard() != None:
+        rect = pc.getBackCard().getCardRect().copy()
+        rect.x -= 10
+        rect.y -= 10
+        gpm.drawRectSurround(rect)
         cardsToDraw.append([pc.getBackCard()])
 
     if dp.getNumDumpPile() > 0:
-        cardsToDraw.append([pc.getDumpCard()])
+        rect = pc.getDumpCard().getCardRect().copy()
+        rect.x += 10
+        rect.y += 10
+        gpm.drawRectSurround(rect)
+        cardsToDraw.append([(dp.dumpPile[-1], pc.getDumpCard().getCardRect())])
 
     if pc.canDrawPileCard():
         cardsToDraw.append([pc.getCurrentPileCard()])
 
-    gpm.clearScreen()
-
-    gpm.drawCards(cardsToDraw)
+    gpm.drawCards(cardsToDraw, GM.getElapsedTime() < 1)
     gpm.drawFooter()
     
-#TODO make menu button inside the footer
 #TODO AI mode
+
 #TODO Timed mode ?
 #TODO Animations ?
 
@@ -127,13 +135,13 @@ if __name__ == '__main__':
         retVal = gpm.drawScreen("Table cleared!")
         reset()
         GM.reset(False)
-        GM.addGame()
-        if retVal == 1:
-            gpm.drawMenu()
+        if retVal != 1:
+            GM.addGame()
+            return False
+        return True
 
 
     gameModes = [modeSingle, modeEndless, modeTimed]
-
 
     while 1:
         selected = gpm.drawMenu()
@@ -189,7 +197,14 @@ if __name__ == '__main__':
             GM.scheduleAtFixedOne(gpm.drawFooter)
 
             if cm.getWinState():
-                gameModes[selected]()
+                if gameModes[selected]():
+                    break
+            elif pc.pileFinished and Helper.checkGameOver(cm.getCardsPLevels(), pc.getCards()):
+                clearScreen()
+                gpm.drawScreen("  Game Over!")
+                reset()
+                GM.reset()
+                break
 
         
 

@@ -53,7 +53,7 @@ class GPManager():
 
 
     @staticmethod
-    def drawCard(card, rect = None, direct = False):
+    def drawCard(card, rect = None, direct = False, animated = True):
         if card == None:
             return
         
@@ -65,10 +65,19 @@ class GPManager():
             GPManager.screen.blit(card, rect, special_flags=pg.BLEND_RGBA_MIN)
 
         if direct:
-            GPManager.Update()
+
+            if animated:
+                GPManager.Update()
+                pg.time.delay(70)
+            else:
+                GPManager.Update()
 
     @staticmethod
-    def drawCards(cards):
+    def drawRectSurround(rect):
+        pg.draw.rect(GPManager.screen, (80, 80, 140, 255), rect, 5, border_radius=8)
+
+    @staticmethod
+    def drawCards(cards, animated = True):
         if cards == None:
             return
         
@@ -76,9 +85,18 @@ class GPManager():
             for card in cards_level:
                 if card == None:
                     continue
-                GPManager.drawCard(card)
 
-        GPManager.Update()
+                #used only by the dump cards
+                if isinstance(card, tuple):
+                    GPManager.drawCard(card[0].getCardImage(), card[1])
+
+                elif animated:
+                    GPManager.drawCard(card, None, True, True)
+                else:
+                    GPManager.drawCard(card)
+                    
+        if not animated:
+            GPManager.Update()
 
     @staticmethod
     def highlightCard(card):
@@ -179,40 +197,44 @@ class GPManager():
     
     @staticmethod
     def drawMenu():
+        GPManager.clearScreen()
+        GPManager.__renderTitle("Pyramids Solitaire", (200, 200, 1024, 860), (255, 255, 255))
+
+        single_game = pg.Rect(450, 400, 400, 50)
+        endless     = pg.Rect(450, 450, 400, 50)
+        aimode      = pg.Rect(450, 500, 400, 50)
+        option      = pg.Rect(450, 550, 400, 50)
+        _exit       = pg.Rect(450, 600, 400, 50)
+
+        GPManager.Update()
+
+        # Create a surface with the desired size and draw something on it
+        card1 = GPManager.loadTexture(path = "textures/png/ace_of_clubs.png", resize = (150, 195))
+        card2 = GPManager.loadTexture(path = "textures/png/jack_of_hearts.png", resize = (150, 195))
+        
+        pg.draw.rect(GPManager.screen, (10,110,50,255), (400, 360, 300, 300), border_radius=10)
+        pg.draw.rect(GPManager.screen, (0,60,00,255),  (400, 360, 300, 300), 2, border_radius=10)
+        GPManager.__renderText("1. Single Game", single_game, (255, 255, 255))
+        GPManager.__renderText("2. Endless",     endless,     (255, 255, 255))
+        GPManager.__renderText("3. AI (Endless)", aimode,     (255, 255, 255))
+        GPManager.__renderText("4. Option",      option,      (255, 255, 255))
+        GPManager.__renderText("5. Exit",        _exit,       (255, 255, 255))
+
+        GPManager.Update()
+
+        rotatedCard1, rotatedCard1_rect = GPManager.__getRotatedTexture(card1, 340, (870, 140))
+        GPManager.screen.blit(rotatedCard1, rotatedCard1_rect.topleft)
+        pg.time.delay(100)
+        GPManager.Update()
+
+        rotatedCard2, rotatedCard2_rect = GPManager.__getRotatedTexture(card2, 355, (830, 150))
+        GPManager.screen.blit(rotatedCard2, rotatedCard2_rect.topleft)
+        pg.time.delay(100)
+        GPManager.Update()
+        
         while 1:
+
             GPManager.getEvent()
-            GPManager.clearScreen()
-
-            GPManager.__renderTitle("Pyramids Solitaire", (200, 200, 1024, 860), (255, 255, 255))
-
-            single_game = pg.Rect(450, 400, 400, 50)
-            endless     = pg.Rect(450, 450, 400, 50)
-            aimode      = pg.Rect(450, 500, 400, 50)
-            option      = pg.Rect(450, 550, 400, 50)
-            _exit       = pg.Rect(450, 600, 400, 50)
-
-            ##draw 2 back cards at the left of the title
-            #back_card2_rect_rot = pg.transform.rotate(pg.Surface((110, 155), pg.SRCALPHA), 30)
-            #back_card2_rect = back_card2_rect_rot.get_rect()
-
-            # Create a surface with the desired size and draw something on it
-            card1 = GPManager.loadTexture(path = "textures/png/ace_of_clubs.png", resize = (150, 195))
-            card2 = GPManager.loadTexture(path = "textures/png/jack_of_hearts.png", resize = (150, 195))
-
-            rotatedCard1, rotatedCard1_rect = GPManager.__getRotatedTexture(card1, 340, (870, 140))
-            rotatedCard2, rotatedCard2_rect = GPManager.__getRotatedTexture(card2, 355, (830, 150))
-
-            GPManager.screen.blit(rotatedCard1, rotatedCard1_rect.topleft)
-            GPManager.screen.blit(rotatedCard2, rotatedCard2_rect.topleft)
-
-           
-            pg.draw.rect(GPManager.screen, (10,110,50,255), (400, 360, 300, 300), border_radius=10)
-            pg.draw.rect(GPManager.screen, (0,60,00,255),  (400, 360, 300, 300), 2, border_radius=10)
-            GPManager.__renderText("1. Single Game", single_game, (255, 255, 255))
-            GPManager.__renderText("2. Endless",     endless,     (255, 255, 255))
-            GPManager.__renderText("3. AI (Endless)", aimode,     (255, 255, 255))
-            GPManager.__renderText("4. Option",      option,      (255, 255, 255))
-            GPManager.__renderText("5. Exit",        _exit,       (255, 255, 255))
 
             if GPManager.getEventQuit():
                 exit()
@@ -229,7 +251,7 @@ class GPManager():
                 elif _exit.collidepoint(pg.mouse.get_pos()):
                     exit()
 
-            GPManager.Update()
+            
 
     @staticmethod
     def drawFooter():
@@ -286,33 +308,39 @@ class GPManager():
             GPManager.getEvent()
             GPManager.clearScreen()
 
+            pg.draw.rect(GPManager.screen, (10,110,50,255), (270, 250, 520, 300), border_radius=10)
+            pg.draw.rect(GPManager.screen, (0,60,00,255),  (270, 250, 520, 300), 2, border_radius=10)
+
             if GPManager.getEventQuit():
                 exit()
 
+            options_text = GPManager.font.render("Options", True, white)
+            GPManager.screen.blit(options_text, (300, 260))
+
             reload_times_text = GPManager.font.render("Reload Times: " + str(reload_times_value), True, white)
-            GPManager.screen.blit(reload_times_text, (300, 200))
+            GPManager.screen.blit(reload_times_text, (380, 330))
 
             shuffle_text = GPManager.font.render("Shuffle: " + ("On" if shuffle_value else "Off"), True, white if shuffle_value else red)
-            GPManager.screen.blit(shuffle_text, (300, 240))
+            GPManager.screen.blit(shuffle_text, (380, 380))
 
             hint_text = GPManager.font.render("Hint: " + ("On" if hint_value else "Off"), True, white if hint_value else red)
-            GPManager.screen.blit(hint_text, (300, 280))
+            GPManager.screen.blit(hint_text, (380, 420))
 
             confirm_text = GPManager.font.render("Confirm changes", True, white)
-            GPManager.screen.blit(confirm_text, (300, 340))
+            GPManager.screen.blit(confirm_text, (420, 500))
 
-            plus_button_rect_r, minus_button_rect_r = GPManager.__drawPlusMinusButton(pg.Rect(570, 200, 30, 30), pg.Rect(520, 200, 30, 30))
+            plus_button_rect_r, minus_button_rect_r = GPManager.__drawPlusMinusButton(pg.Rect(680, 325, 30, 30), pg.Rect(630, 325, 30, 30))
 
             if GPManager.event.type == pg.MOUSEBUTTONDOWN and GPManager.event.button == 1:
                 if plus_button_rect_r.collidepoint(GPManager.event.pos):
                     reload_times_value += 1
                 elif minus_button_rect_r.collidepoint(GPManager.event.pos):
                     reload_times_value -= 1 if reload_times_value > 1 else 0
-                elif shuffle_text.get_rect(topleft=(300, 240)).collidepoint(GPManager.event.pos):
+                elif shuffle_text.get_rect(topleft=(380, 380)).collidepoint(GPManager.event.pos):
                     shuffle_value = (shuffle_value + 1) % 2
-                elif hint_text.get_rect(topleft=(300, 280)).collidepoint(GPManager.event.pos):
+                elif hint_text.get_rect(topleft=(380, 420)).collidepoint(GPManager.event.pos):
                     hint_value = (hint_value + 1) % 2
-                elif confirm_text.get_rect(topleft=(300, 340)).collidepoint(GPManager.event.pos):
+                elif confirm_text.get_rect(topleft=(420, 500)).collidepoint(GPManager.event.pos):
                     Options.setOption("shuffle", shuffle_value)
                     Options.setOption("reload", reload_times_value)
                     Options.setOption("hint", hint_value)
@@ -322,19 +350,20 @@ class GPManager():
 
 
     def drawScreen(str):
+
+        pg.draw.rect(GPManager.screen, (10,110,50,255), (300, 250, 520, 300), border_radius=10)
+        pg.draw.rect(GPManager.screen, (0,60,00,255),  (300, 250, 520, 300), 2, border_radius=10)
+
+        GPManager.__renderTitle(f"{str}", (320, 300, 1024, 860), (255, 255, 255))
+
+        restart     = pg.Rect(500, 400, 1024, 50)
+        goMenu      = pg.Rect(500, 450, 1024, 50)
+
+        GPManager.__renderText("Restart", restart, (255, 255, 255))
+        GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
+
         while 1:
             GPManager.getEvent()
-
-            pg.draw.rect(GPManager.screen, (10,110,50,255), (330, 250, 520, 300), border_radius=10)
-            pg.draw.rect(GPManager.screen, (0,60,00,255),  (330, 250, 520, 300), 2, border_radius=10)
-
-            GPManager.__renderTitle(f"{str}", (350, 300, 1024, 860), (255, 255, 255))
-
-            restart     = pg.Rect(400, 400, 1024, 50)
-            goMenu      = pg.Rect(400, 450, 1024, 50)
-
-            GPManager.__renderText("Restart", restart, (255, 255, 255))
-            GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
 
             if GPManager.getEventQuit():
                 exit()
