@@ -254,7 +254,7 @@ class GPManager():
             
 
     @staticmethod
-    def drawFooter():
+    def drawFooter(flip = False):
         #color wood
         pg.draw.rect(GPManager.screen, (150,42,60,255), (0, 780, 1100, 120))
 
@@ -272,14 +272,15 @@ class GPManager():
         GPManager.screen.blit(GPManager.menuTexture, GPManager.menuTexture_rect)
         GPManager.screen.blit(GPManager.resetTexture, GPManager.resetTexture_rect)
         
-        GPManager.Update()
+        if flip:
+            GPManager.Update()
 
 
     def __drawPlusMinusButton(plus_button_rect, minus_button_rect):
 
         white = (255, 255, 255)
 
-        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), plus_button_rect, border_radius=8)
+        pg.draw.rect(GPManager.screen, (0, 80, 0, 128), plus_button_rect, border_radius=8)
 
         # disegnamo prima |
         pg.draw.line(GPManager.screen, white, (plus_button_rect.centerx, plus_button_rect.top + 5), (plus_button_rect.centerx, plus_button_rect.bottom - 5), 3)
@@ -287,12 +288,14 @@ class GPManager():
         # disegnamo poi ----
         pg.draw.line(GPManager.screen, white, (plus_button_rect.left + 5, plus_button_rect.centery), (plus_button_rect.right - 5, plus_button_rect.centery), 3)
 
-        pg.draw.rect(GPManager.screen, (0, 0, 0, 128), minus_button_rect, border_radius=8)
+        pg.draw.rect(GPManager.screen, (0, 80, 0, 128), minus_button_rect, border_radius=8)
 
         #per il meno disegnamo solo -----
         pg.draw.line(GPManager.screen, white, (minus_button_rect.left + 5, minus_button_rect.centery), (minus_button_rect.right - 5, minus_button_rect.centery), 3)
 
         return plus_button_rect, minus_button_rect
+    
+    
     
     @staticmethod
     def drawOptions():

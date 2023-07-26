@@ -36,6 +36,11 @@ class CM:
     
     def getWinState(self):
         return len(self.cards_enabled) == 0
+    
+    def getCardByID(self, id):
+        level = id // 10
+        index = id % 10
+        return self.cards_p_levels[level][index]
 
     
     def getCardsPLevels(self, all = False):

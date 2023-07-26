@@ -89,5 +89,14 @@ class PileCards:
         self.card_pile_obj.remove(card)
 
     def addCard(self, card):
+        self.next_p -= 1
+        self.pileFinished = False
+
+        if self.resetted > 0 and self.next_p == 0:
+            self.resetted -= 1
+
+        if self.next_p < -1:
+            self.next_p = -1
+
         self.card_pile_obj.append(card)
        

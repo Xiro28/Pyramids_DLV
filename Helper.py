@@ -39,6 +39,9 @@ class Helper:
     
     @staticmethod
     def checkGameOver(cards, pile_cards):
+
+        if len(cards) == 0:
+            return False
         
         for deckCard in cards:
 
