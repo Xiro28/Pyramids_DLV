@@ -7,13 +7,35 @@ class GM:
     start_time = time.time()
 
     @staticmethod
-    def reset(reset_game = True):
-        GM.points = 0
+    def reset(reset_game = True, reset_points = True):
         GM.move = 0
+
+        if reset_points:
+            GM.points = 0
+        
         if reset_game:
             GM.game = 1
+            GM.wins = 0
+            GM.loses = 0
+            
         GM.start_time = time.time()
 
+
+    @staticmethod
+    def getWins():
+        return GM.wins
+    
+    @staticmethod
+    def addWin():
+        GM.wins += 1
+    
+    @staticmethod
+    def getLoses():
+        return GM.loses
+    
+    @staticmethod
+    def addLose():
+        GM.loses += 1
 
     @staticmethod
     def getGame():

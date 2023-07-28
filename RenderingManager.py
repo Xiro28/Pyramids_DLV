@@ -352,7 +352,7 @@ class GPManager():
             GPManager.Update()
 
 
-    def drawScreen(str):
+    def drawScreen(str, continue_game = False):
 
         pg.draw.rect(GPManager.screen, (10,110,50,255), (300, 250, 520, 300), border_radius=10)
         pg.draw.rect(GPManager.screen, (0,60,00,255),  (300, 250, 520, 300), 2, border_radius=10)
@@ -362,10 +362,19 @@ class GPManager():
         restart     = pg.Rect(500, 400, 1024, 50)
         goMenu      = pg.Rect(500, 450, 1024, 50)
 
-        GPManager.__renderText("Restart", restart, (255, 255, 255))
-        GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
 
-        while 1:
+        if continue_game:
+            GPManager.__renderText(f"Win : {GM.getWins()}",  restart, (255, 255, 255))
+            GPManager.__renderText(f"Lose : {GM.getLoses()}", goMenu,  (255, 255, 255))
+            GPManager.Update()
+            pg.time.delay(500)
+        else:
+            GPManager.__renderText("Restart", restart, (255, 255, 255))
+            GPManager.__renderText("Menu",     goMenu,  (255, 255, 255))
+            GPManager.Update()
+            
+
+        while not continue_game:
             GPManager.getEvent()
 
             if GPManager.getEventQuit():
@@ -376,6 +385,4 @@ class GPManager():
                     return 0
                 elif goMenu.collidepoint(pg.mouse.get_pos()):
                     return 1
-
-
-            GPManager.Update()
+        return 0

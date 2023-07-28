@@ -1,5 +1,6 @@
 import sys
 from AI.player import Player
+from AudioManager import AudioManager
 
 from CardManager import CM
 from GameManager import GM
@@ -13,6 +14,28 @@ cm = None
 pc = None
 dp = None
 
+def modeEndless():
+        GM.addGame()
+        reset()
+
+def modeTimed():
+    #show win screen and go back to main menu
+    pass
+
+def modeSingle():
+    #show win screen and go back to main menu
+    clearScreen()
+    retVal = gpm.drawScreen("Table cleared!")
+    reset()
+    GM.reset(False)
+    if retVal != 1:
+        GM.addGame()
+        return False
+    return True
+
+
+gameModes = [modeSingle, modeEndless, modeTimed]
+
 def removeCards(card1, card2 = None):
 
     global pc
@@ -24,6 +47,8 @@ def removeCards(card1, card2 = None):
 
     dp.dumpCard(card1)
 
+    AudioManager.playCard()
+
     if card1.isPileCard():
         pc.removeCard(card1)
     else:
@@ -31,6 +56,8 @@ def removeCards(card1, card2 = None):
 
     if card2 != None:
         dp.dumpCard(card2)
+
+        AudioManager.playCard()
 
         if card2.isPileCard():
             pc.removeCard(card2)
@@ -116,13 +143,12 @@ def aiLoopNoRicerca():
 
     PILE_CARD_ID = 999
     clearFlag = True
-    actions = None
 
     global cm
     global pc
     global dp
     global gpm
-
+    global gameModes
 
     while 1:
         gpm.getEvent()
@@ -165,6 +191,8 @@ def aiLoopNoRicerca():
                 else:
                     card = pc.getCurrentPileCard()
 
+                GM.addPoints(100)
+
                 removeCards(card)
                 clearFlag = True
                 pass
@@ -176,6 +204,8 @@ def aiLoopNoRicerca():
                 card1 = None
                 card2 = None
 
+                
+
                 if card1_id == PILE_CARD_ID:
                     card1 = pc.getCurrentPileCard()
                 else:
@@ -186,22 +216,28 @@ def aiLoopNoRicerca():
                 else:
                     card2 = cm.getCardByID(int(card2_id))
                 
+                GM.addPoints(200)
                 removeCards(card1, card2)
                 clearFlag = True
             elif action == "nextCardPile":
                 pc.getNextPileCard()
                 clearFlag = True
 
+            AudioManager.playCard()
+
             if cm.getWinState():
-                if gameModes[0]():
-                    return True
+                clearScreen()
+                reset()
+                GM.addWin()
+                GM.addGame()
+                gpm.drawScreen("Table Cleared!", True)
             elif pc.pileFinished and Helper.checkGameOver(cm.getCardsPLevels(), [pc.getCurrentPileCard()]):
                 clearScreen()
-                goBackMenu = gpm.drawScreen("  Game Over!")
                 reset()
-                GM.reset()
-                if goBackMenu:
-                    return True
+                GM.addGame()
+                GM.addLose()
+                GM.reset(False)
+                gpm.drawScreen("  Game Over!", True)
 
     return False
 
@@ -217,7 +253,7 @@ def aiLoopNoRicerca():
 #Meglio termiare il gioco con qualche mossa in piu che finire in game over...
 
 #possibile soluzione: far iterare l'algoritmo fino a quando si trova in una situazione di stallo
-#una volta qui eliminiamo tutte le mosse eseguite e riporviamo prendendo decisioni diverse
+#una volta qui eliminiamo tutte le mosse eseguite e riporviamo prendendo decisioni diverse.
 #se anche prendendo decisioni diverse ci troviamo davanti una situazione di stallo, a questo punto 
 #la piramide è irrisolvibile e quindi siamo in game over
 #altrimenti WIN
@@ -228,17 +264,22 @@ def aiLoopNoRicerca():
 #inseriamo cosi tutti gli answer set in una lista e li iteriamo uno alla volta
 
 #RES: Non ne vale la pena, la versione senza ricerca è piu veloce e non ci sono differenze sostanziali
-#     tra le due versioni. Rimane qui solo per dimostrare che effettivamente c'ho provato
+#     tra le due versioni. Rimane qui solo per dimostrare che effettivamente c'ho provato.
+#     va anche sistemato perchè nl tentativo di ottimizzare il codice ho fatto un po di casino
+
+stackActions = []
+
 def aiLoop(action_todo = None, _id = 0):
 
     PILE_CARD_ID = 999
     clearFlag = True
-    actions = None
 
     global cm
     global pc
     global dp
     global gpm
+    global stackActions
+    global gameModes
 
 
     while 1:
@@ -272,18 +313,20 @@ def aiLoop(action_todo = None, _id = 0):
 
             actions = Player.get_next_actions()
 
-            print(actions[0].get_answer_set())
+            actions = actions[0].get_answer_set()
 
-            for action in actions[0].get_answer_set():
-                #action = action.get_answer_set()
+            stackActions.append(actions)
+
+            while len(stackActions[_id]) > 0:
+                action = stackActions[_id].pop()
                 old_dp_len = dp.getNumDumpPile() 
 
-                aiLoop(action, _id + 1)
+                aiLoop(action, _id)
 
                 for _ in range(dp.getNumDumpPile() - old_dp_len):
                     dp.restoreLastMove()
 
-            if pc.pileFinished and Helper.checkGameOver(cm.getCardsPLevels(), [pc.getCurrentPileCard()]) and id == 0:
+            if id == 0 and pc.pileFinished and Helper.checkGameOver(cm.getCardsPLevels(), [pc.getCurrentPileCard()]):
                 clearScreen()
                 goBackMenu = gpm.drawScreen("  Game Over!")
                 reset()
@@ -292,6 +335,7 @@ def aiLoop(action_todo = None, _id = 0):
                     return True
 
         else:
+
             action = action_todo
 
             gpm.highlightSuggestedCards(Helper.findSumBetweenCards(cm.getCardsPLevels(), pc.getCurrentPileCard()))
@@ -350,34 +394,16 @@ if __name__ == '__main__':
     
     gpm.initGraphics()
 
+    AudioManager.init()
+    AudioManager.playBackground()
+
     cm = CM()
     pc = PileCards(cm)
 
     dp = DPManager(cm, pc)
 
+
     clearFlag = True
-
-    def modeEndless():
-        GM.addGame()
-        reset()
-
-    def modeTimed():
-        #show win screen and go back to main menu
-        pass
-
-    def modeSingle():
-        #show win screen and go back to main menu
-        clearScreen()
-        retVal = gpm.drawScreen("Table cleared!")
-        reset()
-        GM.reset(False)
-        if retVal != 1:
-            GM.addGame()
-            return False
-        return True
-
-
-    gameModes = [modeSingle, modeEndless, modeTimed]
 
     while 1:
         selected = gpm.drawMenu()

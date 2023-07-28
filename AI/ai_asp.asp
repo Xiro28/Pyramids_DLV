@@ -52,12 +52,15 @@ cardFromPile(C1, C3) :- isPileCard(C1), cardsEnabled(C1, V), cardsEnabled(C3, V)
 %paga per gli spostamenti che non i possono fare, sempre se non ci sono re
 %prioritizza i re perche possono sbloccare carte utili per completare i mazzo prima
 
-%:~ N = #count{C1, C2 :leave(C1, C2)}, #count{K : dumpKing(K)} = 0. [N@5]
-%:~ N = #count{C1, C2 :leave(C1, C2)}, #count{K : dumpKing(K)} > 0. [N@1]
+% esempio un nextCardPile avraà un costo maggio dei dump (quindi favoriamo sempre i dump al nextCardPile)
+% MA, anche un dumpKing conterrà un numero alto di leave quindi dobbiamo abbassare il costo nel caso ci trovaimo in quella situazione
+
+:~ N = #count{C1, C2 :leave(C1, C2)}, #count{K : dumpKing(K)} = 0. [N@5]
+:~ N = #count{C1, C2 :leave(C1, C2)}, #count{K : dumpKing(K)} > 0. [1@1]
 
 %semplifichiamo tutto, molta della logica è stata implementata già prima quindi non aveva senso fare un doppio check
 %più leave si sono e minore sara il punteggio di questo stato gioco
-:~ N = #count{C1, C2 :leave(C1, C2)}. [N@1]
+%:~ N = #count{C1, C2 :leave(C1, C2)}. [N@1]
 
 %#show cardFromPile/2.
 #show dump/2.
